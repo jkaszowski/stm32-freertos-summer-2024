@@ -119,13 +119,12 @@ void UartReceiverTask(void* argument)
 extern UART_HandleTypeDef huart2;
 void UartSenderTask(void* argument){
 	while(1){
-//		uint8_t tmp[256];
-//		BaseType_t ret = xQueueReceive(messageQueueHandle, &tmp, 0);
-//		if(ret == pdTRUE)
-//		{
-//			HAL_UART_Transmit_DMA(&huart2, (uint8_t*)tmp, strlen(tmp));
-//		}
-//		println("ok");
+		uint8_t tmp[256];
+		BaseType_t ret = xQueueReceive(messageQueueHandle, &tmp, 0);
+		if(ret == pdTRUE)
+		{
+			HAL_UART_Transmit_DMA(&huart2, (uint8_t*)tmp, strlen(tmp));
+		}
 		osDelay(100);
 	}
 

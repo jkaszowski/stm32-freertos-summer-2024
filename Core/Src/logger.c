@@ -7,6 +7,7 @@
 #include <stdio.h>
 
 extern UART_HandleTypeDef huart2;
+extern QueueHandle_t messageQueueHandle;
 
 void print(char* fmt, ...){
 	static char local_buffer[256];
@@ -14,7 +15,14 @@ void print(char* fmt, ...){
 	va_start(args, fmt);
 	vsprintf( local_buffer,fmt, args);
 	va_end(args);
-	HAL_UART_Transmit_DMA(&huart2, (uint8_t*)local_buffer, strlen(local_buffer));
+	int end = strlen(local_buffer);
+	if(end < 255)
+		local_buffer[end] = 0;
+	else
+		local_buffer[255] = 0;
+
+	xQueueSend(messageQueueHandle, local_buffer, 0);
+
 }
 
 void println(char* fmt, ...){
@@ -24,10 +32,11 @@ void println(char* fmt, ...){
 	vsprintf( local_buffer, fmt, args);
 	va_end(args);
 	int end = strlen(local_buffer);
-	if(end < 510){
+	if(end < 254){
 		local_buffer[end] = '\r';
 		local_buffer[end+1] = '\n';
 		local_buffer[end+2] = '\0';
 	}
-	HAL_UART_Transmit_DMA(&huart2, (uint8_t*)local_buffer, strlen(local_buffer));
+
+	xQueueSend(messageQueueHandle, local_buffer, 0);
 }
